@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from pandas import DataFrame
 from sqlalchemy import create_engine
 from time import sleep
 from selenium import webdriver
@@ -8,8 +9,11 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from dotenv import load_dotenv
 
-def insert_dataframe_to_postgres(df, user, password, host, port, database, table_name):
+load_dotenv()
+
+def insert_dataframe_to_postgres(df: DataFrame, user: str, password: str, host: str, port: int, database: str, table_name: str) -> None:
     connection_string = f'postgresql://{user}:{password}@{host}:{port}/{database}'
     engine = create_engine(connection_string)
     try:
@@ -86,14 +90,20 @@ def unificar_arquivos_xlsx(pasta_origem, nome_arquivo_saida):
         df_concatenado.to_excel(output_path, index=False)
 
         print(f"Arquivo XLSX unificado salvo em: {output_path}")
+        conexao_db = {"user": os.getenv("POSTGRES_USER"),
+                      "password": os.getenv("POSTGRES_PASSWORD"),
+                      "host": os.getenv("POSTGRES_HOST"),
+                      "port": os.getenv("POSTGRES_PORT"),
+                      "database": os.getenv("POSTGRES_DB"),
+                      "table_name": os.getenv("POSTGRES_TABLE")}
 
         # Inserir o DataFrame unificado no PostgreSQL
-        insert_dataframe_to_postgres(df_concatenado, "postgres", "postgress", "localhost", 8080, "postgres", "DadosTCE")
+        insert_dataframe_to_postgres(**conexao_db)
     else:
         print("Nenhum arquivo XLSX foi processado.")
 
-pasta_origem = r'C:\Users\danilo.formanski\Downloads\Arquivos-TCE'
-nome_arquivo_saida = 'TABELA_TCE.xlsx'
+pasta_origem = os.getenv("PASTA_ORIGEM")
+nome_arquivo_saida = os.getenv("NOME_ARQUIVO_SAIDA")
 
 def limpar_pasta(pasta):
     for arquivo in os.listdir(pasta):
@@ -107,7 +117,7 @@ def limpar_pasta(pasta):
 
 def iniciar_driver():
     chrome_options = Options()
-    download_dir = r"C:\Users\danilo.formanski\Downloads\Arquivos-TCE"
+    download_dir = os.getenv("PASTA_ORIGEM")
     prefs = {
         "download.default_directory": download_dir,
         "download.prompt_for_download": False,
@@ -115,7 +125,7 @@ def iniciar_driver():
         "safebrowsing.enabled": True
     }
     chrome_options.add_experimental_option("prefs", prefs)
-    service = Service('chromedriver.exe')
+    service = Service(os.getenv("CHROME_DRIVER_PATH"))
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.maximize_window()
     return driver
@@ -125,9 +135,9 @@ def fazer_login(driver):
         driver.get('https://virtual.tce.sc.gov.br/web/#/home')
         wait = WebDriverWait(driver, 15)
         nome = wait.until(EC.presence_of_element_located((By.ID, 'codigo')))
-        nome.send_keys('05388407900')
+        nome.send_keys(os.getenv("TCE_LOGIN"))
         senha = driver.find_element(By.ID, 'nova')
-        senha.send_keys('Campeao1')
+        senha.send_keys(os.getenv("TCE_PASSWORD"))
         botao_enviar = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit"]')))
         botao_enviar.click()
     except Exception as e:
