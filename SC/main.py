@@ -18,13 +18,17 @@ def insert_dataframe_to_postgres(df: DataFrame, user: str, password: str, host: 
     engine = create_engine(connection_string)
     try:
         with engine.connect() as connection:
-            connection.execute(f"DELETE FROM {table_name};")
-            print(f"Tabela {table_name} limpa com sucesso.")
+            if engine.dialect.has_table(connection, table_name):
+                connection.execute(f"DELETE FROM {table_name};")
+                print(f"Tabela {table_name} limpa com sucesso.")
+            else:
+                print(f"Tabela {table_name} não existe. Será criada automaticamente ao inserir os dados.")
 
         df.to_sql(table_name, engine, if_exists='append', index=False)
         print("Dados inseridos com sucesso.")
     except Exception as e:
         print(f"Erro ao inserir dados: {e}")
+
 
 def unificar_arquivos_xlsx(pasta_origem, nome_arquivo_saida):
     df_list = []
@@ -48,36 +52,24 @@ def unificar_arquivos_xlsx(pasta_origem, nome_arquivo_saida):
                 ente_ug_df.columns = ['Ente', 'UG']
 
                 tipos_nomes = df.iloc[1, 2:].tolist()
-                tipos_nomes = [tipo for tipo in tipos_nomes if tipo != 'Assunto']
-
-                datas = df.iloc[0, 2:].tolist()
-                datas = [data for data in datas if data != "Ano/Mês Referência Informação"]
+                datas_meses = df.iloc[0, 2:].tolist()
 
                 for j in range(len(ente_ug_df)):
-                    if j >= len(ente_ug_df):
-                        break
+                    for idx, tipo in enumerate(tipos_nomes):
+                        temp_df = ente_ug_df.iloc[[j]].copy()
+                        temp_df['Tipo'] = tipo
+                        coluna_tipo = 2 + idx
 
-                    temp_df = ente_ug_df.iloc[[j]].copy()
-                    tipo_atual = tipos_nomes[j % len(tipos_nomes)]
-                    temp_df['Tipo'] = tipo_atual
-
-                    coluna_tipo = 2 + tipos_nomes.index(tipo_atual)
-                    if coluna_tipo < df.shape[1]:
-                        valor = df.iloc[j + 2, coluna_tipo]
+                        valor = df.iloc[j + 2, coluna_tipo] if coluna_tipo < df.shape[1] else None
                         temp_df['Valores'] = valor
-                    else:
-                        temp_df['Valores'] = None
 
-                    if coluna_tipo < len(datas):
-                        data_raw = datas[coluna_tipo - 2]
+                        data_raw = datas_meses[idx]
                         try:
-                            temp_df['Data'] = pd.to_datetime(data_raw).strftime('%d/%m/%Y')
+                            temp_df['Data'] = pd.to_datetime(data_raw).strftime('%m/%Y')
                         except Exception as e:
                             temp_df['Data'] = None
-                    else:
-                        temp_df['Data'] = None
 
-                    df_list.append(temp_df)
+                        df_list.append(temp_df)
 
                 print(f"Arquivo processado: {file_name}")
             except Exception as e:
@@ -86,19 +78,25 @@ def unificar_arquivos_xlsx(pasta_origem, nome_arquivo_saida):
     if df_list:
         df_concatenado = pd.concat(df_list, ignore_index=True)
 
+        df_concatenado = df_concatenado.sort_values(by=["Ente", "Data"], ascending=[True, True])
+
         output_path = os.path.join(pasta_origem, nome_arquivo_saida)
         df_concatenado.to_excel(output_path, index=False)
-
         print(f"Arquivo XLSX unificado salvo em: {output_path}")
-        conexao_db = {"user": os.getenv("POSTGRES_USER"),
-                      "password": os.getenv("POSTGRES_PASSWORD"),
-                      "host": os.getenv("POSTGRES_HOST"),
-                      "port": os.getenv("POSTGRES_PORT"),
-                      "database": os.getenv("POSTGRES_DB"),
-                      "table_name": os.getenv("POSTGRES_TABLE")}
 
-        # Inserir o DataFrame unificado no PostgreSQL
-        insert_dataframe_to_postgres(**conexao_db)
+        conexao_db = {
+            "user": os.getenv("POSTGRES_USER"),
+            "password": os.getenv("POSTGRES_PASSWORD"),
+            "host": os.getenv("POSTGRES_HOST"),
+            "port": os.getenv("POSTGRES_PORT"),
+            "database": os.getenv("POSTGRES_DB"),
+            "table_name": os.getenv("POSTGRES_TABLE")
+        }
+
+        if all(conexao_db.values()):
+            insert_dataframe_to_postgres(df_concatenado, **conexao_db)
+        else:
+            print("Erro: Configurações de conexão com o banco de dados estão incompletas.")
     else:
         print("Nenhum arquivo XLSX foi processado.")
 
