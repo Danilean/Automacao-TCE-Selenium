@@ -246,7 +246,7 @@ def main():
     alternar_para_nova_aba(driver)
     realizar_downloads(driver)
     unificar_arquivos_xlsx(pasta_origem, nome_arquivo_saida)
-    #limpar_pasta(pasta_origem)
+    limpar_pasta(pasta_origem)
     driver.quit()
 
 if __name__ == "__main__":
