@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from pandas import DataFrame
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -17,14 +17,7 @@ def insert_dataframe_to_postgres(df: DataFrame, user: str, password: str, host: 
     connection_string = f'postgresql://{user}:{password}@{host}:{port}/{database}'
     engine = create_engine(connection_string)
     try:
-        with engine.connect() as connection:
-            if engine.dialect.has_table(connection, table_name):
-                connection.execute(f"DELETE FROM {table_name};")
-                print(f"Tabela {table_name} limpa com sucesso.")
-            else:
-                print(f"Tabela {table_name} não existe. Será criada automaticamente ao inserir os dados.")
-
-        df.to_sql(table_name, engine, if_exists='append', index=False)
+        df.to_sql(table_name, engine, if_exists='replace', index=False)
         print("Dados inseridos com sucesso.")
     except Exception as e:
         print(f"Erro ao inserir dados: {e}")
@@ -253,7 +246,7 @@ def main():
     alternar_para_nova_aba(driver)
     realizar_downloads(driver)
     unificar_arquivos_xlsx(pasta_origem, nome_arquivo_saida)
-    limpar_pasta(pasta_origem)
+    #limpar_pasta(pasta_origem)
     driver.quit()
 
 if __name__ == "__main__":
