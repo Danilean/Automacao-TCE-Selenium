@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from dotenv import load_dotenv
+from acesso_tce import acessar_painel_tce
 
 load_dotenv()
 
@@ -71,6 +72,45 @@ def unificar_arquivos_xlsx(pasta_origem, nome_arquivo_saida):
     if df_list:
         df_concatenado = pd.concat(df_list, ignore_index=True)
 
+        municipios_betha = [
+            'ABDON BATISTA', 'AGROLÂNDIA', 'ÁGUA DOCE', 'ÁGUAS DE CHAPECÓ', 'ÁGUAS MORNAS', 'ALFREDO WAGNER',
+            'ANCHIETA', 'ANGELINA', 'ANITA GARIBALDI', 'ANITÁPOLIS', 'ANTÔNIO CARLOS', 'ARMAZÉM', 'ATALANTA',
+            'BALNEÁRIO ARROIO DO SILVA', 'BALNEÁRIO GAIVOTA', 'BALNEÁRIO RINCÃO', 'BANDEIRANTE', 'BELA VISTA DO TOLDO',
+            'BELMONTE', 'BOCAINA DO SUL', 'BOM JARDIM DA SERRA', 'BOM JESUS', 'BRAÇO DO NORTE', 'BRAÇO DO TROMBUDO',
+            'BRUNÓPOLIS', 'CAMPO ALEGRE', 'CAMPO BELO DO SUL', 'CAMPO ERÊ', 'CAMPOS NOVOS', 'CANELINHA', 'CAPINZAL',
+            'CAPIVARI DE BAIXO', 'CATANDUVAS', 'CELSO RAMOS', 'CERRO NEGRO', 'CHAPECÓ', 'CIM - GRANDE FLORIANÓPOLIS',
+            'CIS - GRANFPOLIS', 'COCAL DO SUL', 'CONCÓRDIA',
+            'CONS. INTERM. SAÚDE DA MICRO REGIÃO DA AMURES (CISAMURES)',
+            'CONSÓRCIO CIDAUC', 'CONSÓRCIO CIM AMAI', 'CONSÓRCIO INTERMUNICIPAL ABRIGO CASA LAR - CIALAR',
+            'CONSÓRCIO INTERMUNICIPAL DE GERENCIAMENTO AMBIENTAL - IBERE', 'CORDILHEIRA ALTA', 'CORONEL FREITAS',
+            'CORONEL MARTINS', 'CORREIA PINTO', 'CRICIÚMA', 'CRICIÚMA', 'CUNHATAÍ', 'CURITIBANOS', 'CURITIBANOS',
+            'DESCANSO', 'DIONÍSIO CERQUEIRA', 'DONA EMMA', 'ENTRE RIOS', 'ERMO', 'ERVAL VELHO', 'FAXINAL DOS GUEDES',
+            'FLORIANÓPOLIS', 'FORMOSA DO SUL', 'FORQUILHINHA', 'FREI ROGÉRIO', 'GALVÃO', 'GOVERNADOR CELSO RAMOS',
+            'GRÃO PARÁ', 'HERVAL DOESTE', 'IBIAM', 'IBICARÉ', 'IÇARA', 'IMARUÍ', 'IMBITUBA', 'IMBUIA', 'IOMERÊ',
+            'IPIRA', 'IPUAÇU', 'IPUMIRIM', 'IRACEMINHA', 'IRATI', 'ITAIÓPOLIS', 'ITAJAÍ', 'ITAPEMA', 'JABORÁ',
+            'JACINTO MACHADO', 'JARAGUÁ DO SUL', 'JOAÇABA', 'JUPIÁ', 'LACERDÓPOLIS', 'LAGES', 'LAGUNA',
+            'LAJEADO GRANDE',
+            'LAURO MÜLLER', 'LEOBERTO LEAL', 'LINDÓIA DO SUL', 'LUZERNA', 'MACIEIRA', 'MAJOR GERCINO', 'MAJOR VIEIRA',
+            'MARACAJÁ', 'MARAVILHA', 'MAREMA', 'MATOS COSTA', 'MELEIRO', 'MONDAÍ', 'MONTE CARLO', 'MONTE CASTELO',
+            'MORRO DA FUMAÇA', 'MORRO GRANDE', 'NAVEGANTES', 'NOVA ERECHIM', 'NOVA TRENTO', 'NOVA TRENTO',
+            'NOVA VENEZA',
+            'NOVA VENEZA', 'NOVO HORIZONTE', 'ORLEANS', 'OTACÍLIO COSTA', 'PAINEL', 'PALMITOS', 'PAPANDUVA',
+            'PASSO DE TORRES', 'PASSOS MAIA', 'PAULO LOPES', 'PEDRAS GRANDES', 'PESCARIA BRAVA', 'PETROLÂNDIA',
+            'PIRATUBA', 'PONTE ALTA', 'PONTE ALTA DO NORTE', 'PONTE SERRADA', 'PORTO UNIÃO', 'POUSO REDONDO',
+            'PRAIA GRANDE', 'PRESIDENTE CASTELLO BRANCO', 'QUILOMBO', 'RANCHO QUEIMADO', 'RIO DO SUL', 'RIO FORTUNA',
+            'RIO RUFINO', 'SALTINHO', 'SALTO VELOSO', 'SANGÃO', 'SANTA CECÍLIA', 'SANTA ROSA DE LIMA',
+            'SANTA TEREZINHA', 'SANTA TEREZINHA DO PROGRESSO', 'SANTO AMARO DA IMPERATRIZ', 'SANTO AMARO DA IMPERATRIZ',
+            'SÃO BERNARDINO', 'SÃO BONIFÁCIO', 'SÃO CRISTÓVÃO DO SUL', 'SÃO DOMINGOS', 'SÃO FRANCISCO DO SUL',
+            'SÃO JOÃO BATISTA', 'SÃO JOÃO DO OESTE', 'SÃO JOAQUIM', 'SÃO JOSÉ DO CERRITO', 'SÃO LOURENÇO DO OESTE',
+            'SÃO LUDGERO', 'SÃO MARTINHO', 'SÃO MIGUEL DA BOA VISTA', 'SÃO MIGUEL DO OESTE', 'SÃO PEDRO DE ALCÂNTARA',
+            'SCHROEDER', 'SEARA', 'SIDERÓPOLIS', 'SOMBRIO', 'TANGARÁ', 'TIGRINHOS', 'TREZE DE MAIO', 'TROMBUDO CENTRAL',
+            'TUBARÃO', 'TUBARÃO', 'TUNÁPOLIS', 'TURVO', 'UNIÃO DO OESTE', 'URUBICI', 'URUSSANGA', 'VARGEÃO',
+            'VARGEM', 'VARGEM BONITA', 'VIDAL RAMOS', 'XANXERÊ', 'XAVANTINA', 'XAXIM'
+        ]
+
+        df_concatenado['Clientes'] = df_concatenado['Ente'].apply(
+            lambda x: "Betha Sistemas" if x in municipios_betha else "Concorrente")
+
         df_concatenado = df_concatenado.sort_values(by=["Ente", "Data"], ascending=[True, True])
 
         output_path = os.path.join(pasta_origem, nome_arquivo_saida)
@@ -108,6 +148,9 @@ def limpar_pasta(pasta):
 
 def iniciar_driver():
     chrome_options = Options()
+    chrome_options.add_argument('--ignore-certificate-errors')
+    chrome_options.add_argument('--ignore-ssl-errors')
+
     download_dir = os.getenv("PASTA_ORIGEM")
     prefs = {
         "download.default_directory": download_dir,
@@ -242,6 +285,7 @@ def realizar_downloads(driver):
 def main():
     driver = iniciar_driver()
     fazer_login(driver)
+    acessar_painel_tce()
     navegar_para_extrato(driver)
     alternar_para_nova_aba(driver)
     realizar_downloads(driver)
