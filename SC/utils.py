@@ -1,8 +1,9 @@
 import os
 from time import sleep
+from selenium.webdriver.common.by import By
+
 
 def scroll_page(driver, container_css, pixels_to_scroll):
-    """Scrolls inside a specific element."""
     try:
         container = driver.find_element(By.CSS_SELECTOR, container_css)
         driver.execute_script(f"arguments[0].scrollTop += {pixels_to_scroll};", container)
@@ -11,7 +12,6 @@ def scroll_page(driver, container_css, pixels_to_scroll):
         print(f"Scrolling error: {e}")
 
 def clean_folder(folder):
-    """Removes all files inside the given folder."""
     if os.path.exists(folder):
         for file in os.listdir(folder):
             file_path = os.path.join(folder, file)

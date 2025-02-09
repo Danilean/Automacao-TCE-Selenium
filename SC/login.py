@@ -5,7 +5,6 @@ from config import TCE_LOGIN, TCE_PASSWORD
 
 
 def login(driver):
-    """Performs login on the TCE portal."""
     try:
         driver.get('https://virtual.tce.sc.gov.br/web/#/home')
         wait = WebDriverWait(driver, 15)

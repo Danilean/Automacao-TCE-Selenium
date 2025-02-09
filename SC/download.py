@@ -6,7 +6,6 @@ from time import sleep
 
 
 def download_files(driver):
-    """Downloads files from the TCE portal."""
     try:
         wait = WebDriverWait(driver, 50)
         sleep(5)

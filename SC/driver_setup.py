@@ -5,7 +5,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from config import DOWNLOAD_FOLDER
 
 def start_driver():
-    """Initializes the Chrome WebDriver with optimized settings."""
     options = Options()
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-ssl-errors')
