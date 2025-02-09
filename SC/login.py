@@ -3,8 +3,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config import TCE_LOGIN, TCE_PASSWORD
 
-
-def login(driver):
+def fazer_login(driver):
     try:
         driver.get('https://virtual.tce.sc.gov.br/web/#/home')
         wait = WebDriverWait(driver, 15)
@@ -13,6 +12,6 @@ def login(driver):
         driver.find_element(By.ID, 'nova').send_keys(TCE_PASSWORD)
         wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit"]'))).click()
     except Exception as e:
-        print(f"Login error: {e}")
+        print(f"Erro no login: {e}")
         driver.quit()
         exit()

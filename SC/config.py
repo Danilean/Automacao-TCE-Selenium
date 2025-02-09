@@ -1,9 +1,10 @@
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
-DOWNLOAD_FOLDER = os.getenv("PASTA_ORIGEM", "")
-OUTPUT_FILE_NAME = os.getenv("NOME_ARQUIVO_SAIDA", "")
+PASTA_ORIGEM = os.getenv("PASTA_ORIGEM", "")
+NOME_ARQUIVO_SAIDA = os.getenv("NOME_ARQUIVO_SAIDA", "")
 CHROME_DRIVER_PATH = os.getenv("CHROME_DRIVER_PATH", "")
 
 TCE_LOGIN = os.getenv("TCE_LOGIN", "")

@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.options import Options
 import time
 
 
-def access_tce_panel():
+def acessar_painel_tce():
     chrome_options = Options()
     chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.add_argument('--ignore-ssl-errors')
@@ -27,4 +27,4 @@ def access_tce_panel():
 
 
 if __name__ == "__main__":
-    access_tce_panel()
+    acessar_painel_tce()
