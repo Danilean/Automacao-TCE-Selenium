@@ -2,7 +2,9 @@ import os
 import pandas as pd
 from pandas import DataFrame
 from sqlalchemy import create_engine, text
+from dotenv import load_dotenv
 
+load_dotenv()
 municipios_betha = [
             'ABDON BATISTA', 'AGROLÂNDIA', 'ÁGUA DOCE', 'ÁGUAS DE CHAPECÓ', 'ÁGUAS MORNAS', 'ALFREDO WAGNER',
             'ANCHIETA', 'ANGELINA', 'ANITA GARIBALDI', 'ANITÁPOLIS', 'ANTÔNIO CARLOS', 'ARMAZÉM', 'ATALANTA',
