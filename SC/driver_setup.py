@@ -7,7 +7,8 @@ from selenium.webdriver.chrome.options import Options
 load_dotenv()
 
 def iniciar_driver():
-    pasta_origem = os.getenv("PASTA_ORIGEM", r"C:\Users\danilo.formanski\Downloads\Arquivos-TCE")
+    pasta_origem = os.getenv("PASTA_ORIGEM")
+    chrome_driver_path = os.getenv("CHROMEDRIVER_PATH")
 
     chrome_options = Options()
     chrome_options.add_argument('--headless=new')
@@ -27,7 +28,7 @@ def iniciar_driver():
     }
     chrome_options.add_experimental_option("prefs", prefs)
 
-    service = Service(r"C:\Users\danilo.formanski\Downloads\Code\Automacao-TCE-Selenium\SC\chromedriver.exe")
+    service = Service(chrome_driver_path)
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     return driver
