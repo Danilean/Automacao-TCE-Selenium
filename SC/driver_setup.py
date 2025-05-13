@@ -8,12 +8,12 @@ load_dotenv()
 
 def iniciar_driver():
     pasta_origem = os.getenv("PASTA_ORIGEM")
-    chrome_driver_path = os.getenv("CHROMEDRIVER_PATH")
+    chrome_driver_path = os.getenv("CHROME_DRIVER_PATH")
 
     chrome_options = Options()
-    chrome_options.add_argument('--headless=new')
+    #chrome_options.add_argument('--headless=new')
     chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--window-size=1920,1080')
+    # chrome_options.add_argument('--window-size=1920,1080')
     chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.add_argument('--ignore-ssl-errors')
     chrome_options.add_argument('--disable-extensions')

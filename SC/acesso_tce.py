@@ -1,30 +1,19 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-
-def acessar_painel_tce():
-    chrome_options = Options()
-    chrome_options.add_argument('--ignore-certificate-errors')
-    chrome_options.add_argument('--ignore-ssl-errors')
-
-    driver = webdriver.Chrome(options=chrome_options)
-
+def acessar_painel_tce(driver):
     url = "https://paineis.tce.sc.gov.br"
-
     try:
         driver.get(url)
-        print("Acesso ao site realizado com sucesso.")
+        print("Tentando acessar:", url)
 
-        time.sleep(5)
-
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+        print("Site carregado com sucesso.")
 
     except Exception as e:
         print(f"Ocorreu um erro ao acessar o site: {e}")
-    finally:
         driver.quit()
-        print("Navegador fechado.")
-
-
-if __name__ == "__main__":
-    acessar_painel_tce()
+        exit()
